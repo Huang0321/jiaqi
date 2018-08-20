@@ -29,24 +29,23 @@ def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bi
         if a_value['ask1_price'] == a_ask_price1 and a_value['bid1_price'] == a_bid1_price and \
             b_value['ask1_price'] == b_ask1_price and b_value['bid1_price'] == b_bid1_price:
             return {"status": -1, 'msg': 'Order_book has not change yet'}
-		else:
-			a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
-			b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
-			print(a_value['pair'])
-			if a > 0.0035:
-				count[0] += 1
-				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
-				logger.info('a: %s; b: %s' % (a_value, b_value))
-				logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
-				return {'status': 0}
-			elif b > 0.0035:
-				count[1] += 1
-				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
-				logger.info('a: %s; b: %s' % (a_value, b_value))
-				logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
-				return {'status': 0}
-			else:
-				return {'status': -1, 'msg': 'No signal'}
+        else:
+            a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
+            b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
+           if a > 0.0035:
+                count[0] += 1
+                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
+                logger.info('a: %s; b: %s' % (a_value, b_value))
+                logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
+                return {'status': 0}
+            elif b > 0.0035:
+                count[1] += 1
+                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
+                logger.info('a: %s; b: %s' % (a_value, b_value))
+                logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
+                return {'status': 0}
+           else:
+                return {'status': -1, 'msg': 'No signal'}
     else:
         return {'status':-1, 'errmsg': 'fetch_book_error'}
 
