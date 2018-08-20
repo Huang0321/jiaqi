@@ -29,26 +29,24 @@ def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bi
         if a_value['ask1_price'] == a_ask_price1 and a_value['bid1_price'] == a_bid1_price and \
             b_value['ask1_price'] == b_ask1_price and b_value['bid1_price'] == b_bid1_price:
             return {"status": -1, 'msg': 'Order_book has not change yet'}
-        else:
-            a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
-            b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
-            print(a_value['pair'])
-            print('a=', a)
-            print('b=', b)
-            if a > 0.0035:
-                count[0] += 1
-                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
-                logger.info('a: %s; b: %s' % (a_value, b_value))
-                logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
-                return {'status': 0}
-            elif b > 0.0035:
-                count[1] += 1
-                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
-                logger.info('a: %s; b: %s' % (a_value, b_value))
-                logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
-                return {'status': 0}
-            else:
-                return {'status': -1, 'msg': 'No signal'}
+		else:
+			a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
+			b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
+			print(a_value['pair'])
+			if a > 0.0035:
+				count[0] += 1
+				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
+				logger.info('a: %s; b: %s' % (a_value, b_value))
+				logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+				return {'status': 0}
+			elif b > 0.0035:
+				count[1] += 1
+				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
+				logger.info('a: %s; b: %s' % (a_value, b_value))
+				logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+				return {'status': 0}
+			else:
+				return {'status': -1, 'msg': 'No signal'}
     else:
         return {'status':-1, 'errmsg': 'fetch_book_error'}
 
@@ -57,18 +55,18 @@ def main():
     okex = ccxt.okex()
     bittrex = ccxt.bittrex()
 
-    temp = re.compile('{(.*)}')
+    # temp = re.compile('{(.*)}')
 
-    with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
-        info = sam_pair.readline()
+    # with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
+      #  info = sam_pair.readline()
 
-    math_str = temp.search(info)
+   #  math_str = temp.search(info)
 
-    same_pair_str = math_str.group(1)
+   #  same_pair_str = math_str.group(1)
 
-    same_pair_str = same_pair_str.replace("'", '')
-    same_pair_str = same_pair_str.replace(" ", '')
-    same_pair_list = same_pair_str.split(',')
+   # same_pair_str = same_pair_str.replace("'", '')
+    # same_pair_str = same_pair_str.replace(" ", '')
+    # same_pair_list = same_pair_str.split(',')
 
     # 创造记录上一次价格的变量，以便盘口信息没有变动，但是一直判断有交易信号
     a_ask1_price = 0
@@ -92,12 +90,12 @@ def main():
     while True:
         time.sleep(0.5)
         try:
-            tasks = [gevent.spawn(fetch_order_book, okex, 'NEO/USDT'),
-                     gevent.spawn(fetch_order_book, okex, 'ADA/BTC'),
-                     gevent.spawn(fetch_order_book, okex, 'XRP/BTC'),
-                     gevent.spawn(fetch_order_book, bittrex, 'NEO/USDT'),
-                     gevent.spawn(fetch_order_book, bittrex, 'ADA/BTC'),
-                     gevent.spawn(fetch_order_book, bittrex, 'XRP/BTC')]
+            tasks = [gevent.spawn(fetch_order_book, okex, 'TRX/USDT'),
+                     gevent.spawn(fetch_order_book, okex, 'XLM/BTC'),
+                     gevent.spawn(fetch_order_book, okex, 'NEO/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'TRX/USDT'),
+                     gevent.spawn(fetch_order_book, bittrex, 'XLM/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'NEO/BTC')]
             gevent.joinall(tasks)
             task1, task2, task3, task4, task5, task6 = tasks
             # print(task1.value, task4.value)
@@ -119,7 +117,7 @@ def main():
                 print('a_circle_end\n')
             except Exception as e:
                 logger.error('e')
-
+   
 
 if __name__ == '__main__':
     main()
