@@ -1,7 +1,7 @@
 import logging
 
 ch = logging.StreamHandler()
-fh = logging.FileHandler('ok_bit_statistics.log')
+fh = logging.FileHandler('ok_bit_statistics_max.log')
 
 
 def create_logger(level=logging.DEBUG, record_format=None):

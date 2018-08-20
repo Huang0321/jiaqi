@@ -24,23 +24,33 @@ def fetch_order_book(client, pair):
         return {'status': -1, 'errmsg': 'request_failed'}
 
 
-def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bid1_price):
-    if a_value['ask1_price'] == a_ask_price1 and a_value['bid1_price'] == a_bid1_price and \
-        b_value['ask1_price'] == b_ask1_price and b_value['bid1_price'] == b_bid1_price:
-        return {"status": -1, 'msg': 'Order_book has not change yet'}
-    else:
-        a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
-        b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
-        print('a=', a)
-        print('b=', b)
-        if a > 0.0035:
-            logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
-            return {'status': 0}
-        elif b > 0.0035:
-            logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
-            return {'status': 0}
+def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bid1_price, count):
+    if a_value['status'] == 0 and b_value['status'] == 0:
+        if a_value['ask1_price'] == a_ask_price1 and a_value['bid1_price'] == a_bid1_price and \
+            b_value['ask1_price'] == b_ask1_price and b_value['bid1_price'] == b_bid1_price:
+            return {"status": -1, 'msg': 'Order_book has not change yet'}
         else:
-            return {'status': -1, 'msg': 'No signal'}
+            a = (a_value['bid1_price'] - b_value['ask1_price']) / a_value['bid1_price']
+            b = (b_value['bid1_price'] - a_value['ask1_price']) / b_value['bid1_price']
+            print(a_value['pair'])
+            print('a=', a)
+            print('b=', b)
+            if a > 0.0035:
+                count[0] += 1
+                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
+                logger.info('a: %s; b: %s' % (a_value, b_value))
+                logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+                return {'status': 0}
+            elif b > 0.0035:
+                count[1] += 1
+                logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
+                logger.info('a: %s; b: %s' % (a_value, b_value))
+                logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+                return {'status': 0}
+            else:
+                return {'status': -1, 'msg': 'No signal'}
+    else:
+        return {'status':-1, 'errmsg': 'fetch_book_error'}
 
 
 def main():
@@ -75,19 +85,19 @@ def main():
     f_bid1_price = 0
 
     # 计数产生交易信号的次数， 初始为0
-    count1 = 0
-    count2 = 0
-    count3 = 0
+    count1 = [0, 0]
+    count2 = [0, 0]
+    count3 = [0, 0]
 
     while True:
         time.sleep(0.5)
         try:
-            tasks = [gevent.spawn(fetch_order_book, okex, same_pair_list[3]),
-                     gevent.spawn(fetch_order_book, okex, same_pair_list[4]),
-                     gevent.spawn(fetch_order_book, okex, same_pair_list[5]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[3]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[4]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[5])]
+            tasks = [gevent.spawn(fetch_order_book, okex, 'NEO/USDT'),
+                     gevent.spawn(fetch_order_book, okex, 'ADA/BTC'),
+                     gevent.spawn(fetch_order_book, okex, 'XRP/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'NEO/USDT'),
+                     gevent.spawn(fetch_order_book, bittrex, 'ADA/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'XRP/BTC')]
             gevent.joinall(tasks)
             task1, task2, task3, task4, task5, task6 = tasks
             # print(task1.value, task4.value)
@@ -96,25 +106,19 @@ def main():
         except Exception as e:
             logger.error(e)
         else:
-            result1 = judge_price(task1.value, task4.value, a_ask1_price, a_bid1_price, d_ask1_price, d_bid1_price)
-            result2 = judge_price(task2.value, task5.value, b_ask1_price, b_bid1_price, e_ask1_price, e_bid1_price)
-            result3 = judge_price(task3.value, task6.value, c_ask1_price, c_bid1_price, f_ask1_price, f_bid1_price)
-            if result1['status'] == 0:
-                count1 += 1
-                logger.warn(f'count1: {count1}')
-            if result2['status'] == 0:
-                count2 += 1
-                logger.warn(f'count2: {count2}')
-            if result3['status'] == 0:
-                count3 += 1
-                logger.warn(f'count3: {count3}')
-            a_ask1_price, a_bid1_price = task1.value['ask1_price'], task1.value['bid1_price']
-            b_ask1_price, b_bid1_price = task2.value['ask1_price'], task2.value['bid1_price']
-            c_ask1_price, c_bid1_price = task3.value['ask1_price'], task3.value['bid1_price']
-            d_ask1_price, d_bid1_price = task4.value['ask1_price'], task4.value['bid1_price']
-            e_ask1_price, e_bid1_price = task5.value['ask1_price'], task5.value['bid1_price']
-            f_ask1_price, f_bid1_price = task6.value['ask1_price'], task6.value['bid1_price']
-            print('a_circle_end\n')
+            result1 = judge_price(task1.value, task4.value, a_ask1_price, a_bid1_price, d_ask1_price, d_bid1_price, count1)
+            result2 = judge_price(task2.value, task5.value, b_ask1_price, b_bid1_price, e_ask1_price, e_bid1_price, count2)
+            result3 = judge_price(task3.value, task6.value, c_ask1_price, c_bid1_price, f_ask1_price, f_bid1_price, count3)
+            try:
+                a_ask1_price, a_bid1_price = task1.value['ask1_price'], task1.value['bid1_price']
+                b_ask1_price, b_bid1_price = task2.value['ask1_price'], task2.value['bid1_price']
+                c_ask1_price, c_bid1_price = task3.value['ask1_price'], task3.value['bid1_price']
+                d_ask1_price, d_bid1_price = task4.value['ask1_price'], task4.value['bid1_price']
+                e_ask1_price, e_bid1_price = task5.value['ask1_price'], task5.value['bid1_price']
+                f_ask1_price, f_bid1_price = task6.value['ask1_price'], task6.value['bid1_price']
+                print('a_circle_end\n')
+            except Exception as e:
+                logger.error('e')
 
 
 if __name__ == '__main__':
