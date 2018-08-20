@@ -37,13 +37,13 @@ def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bi
 				count[0] += 1
 				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[0]))
 				logger.info('a: %s; b: %s' % (a_value, b_value))
-				logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+				logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
 				return {'status': 0}
 			elif b > 0.0035:
 				count[1] += 1
 				logger.info("name = {}; a = {}; b= {}; count = {}".format(a_value['pair'], a, b, count[1]))
 				logger.info('a: %s; b: %s' % (a_value, b_value))
-				logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+				logger.critical('{} Generate transaction signal: {} {}'.format(a_value["pair"], a_value, b_value))
 				return {'status': 0}
 			else:
 				return {'status': -1, 'msg': 'No signal'}
