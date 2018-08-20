@@ -34,10 +34,11 @@ def judge_price(a_value, b_value, a_ask_price1, a_bid1_price, b_ask1_price, b_bi
         print('a=', a)
         print('b=', b)
         if a > 0.0035:
-            logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+            logger.critical('%s Generate transaction signal: %s %s') % (a_value['pair'], a_value, b_value)
             return {'status': 0}
         elif b > 0.0035:
-            logger.critical(f'{a_value["pair"]} Generate transaction signal: {a_value} {b_value}')
+            logger.critical('%s Generate transaction signal: %s %s') % (a_value['pair'], a_value, b_value)
+            return {'status': 0}
             return {'status': 0}
         else:
             return {'status': -1, 'msg': 'No signal'}
@@ -47,18 +48,18 @@ def main():
     okex = ccxt.okex()
     bittrex = ccxt.bittrex()
 
-    temp = re.compile('{(.*)}')
+    # temp = re.compile('{(.*)}')
 
-    with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
-        info = sam_pair.readline()
+    # with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
+      #  info = sam_pair.readline()
 
-    math_str = temp.search(info)
+   #  math_str = temp.search(info)
 
-    same_pair_str = math_str.group(1)
+   #  same_pair_str = math_str.group(1)
 
-    same_pair_str = same_pair_str.replace("'", '')
-    same_pair_str = same_pair_str.replace(" ", '')
-    same_pair_list = same_pair_str.split(',')
+   # same_pair_str = same_pair_str.replace("'", '')
+    # same_pair_str = same_pair_str.replace(" ", '')
+    # same_pair_list = same_pair_str.split(',')
 
     # 创造记录上一次价格的变量，以便盘口信息没有变动，但是一直判断有交易信号
     a_ask1_price = 0
@@ -82,12 +83,12 @@ def main():
     while True:
         time.sleep(0.5)
         try:
-            tasks = [gevent.spawn(fetch_order_book, okex, same_pair_list[3]),
-                     gevent.spawn(fetch_order_book, okex, same_pair_list[4]),
-                     gevent.spawn(fetch_order_book, okex, same_pair_list[5]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[3]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[4]),
-                     gevent.spawn(fetch_order_book, bittrex, same_pair_list[5])]
+            tasks = [gevent.spawn(fetch_order_book, okex, 'TRX/USDT'),
+                     gevent.spawn(fetch_order_book, okex, 'XLM/BTC'),
+                     gevent.spawn(fetch_order_book, okex, 'NEO/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'TRX/USDT'),
+                     gevent.spawn(fetch_order_book, bittrex, 'XLM/BTC'),
+                     gevent.spawn(fetch_order_book, bittrex, 'NEO/BTC')]
             gevent.joinall(tasks)
             task1, task2, task3, task4, task5, task6 = tasks
             # print(task1.value, task4.value)
@@ -101,13 +102,13 @@ def main():
             result3 = judge_price(task3.value, task6.value, c_ask1_price, c_bid1_price, f_ask1_price, f_bid1_price)
             if result1['status'] == 0:
                 count1 += 1
-                logger.warn(f'count1: {count1}')
+                logger.warn('count1: %s' % (count1))
             if result2['status'] == 0:
                 count2 += 1
-                logger.warn(f'count2: {count2}')
+                logger.warn('count2: %s' % (count2))
             if result3['status'] == 0:
                 count3 += 1
-                logger.warn(f'count3: {count3}')
+                logger.warn('count3: %s' % (count3))
             a_ask1_price, a_bid1_price = task1.value['ask1_price'], task1.value['bid1_price']
             b_ask1_price, b_bid1_price = task2.value['ask1_price'], task2.value['bid1_price']
             c_ask1_price, c_bid1_price = task3.value['ask1_price'], task3.value['bid1_price']
