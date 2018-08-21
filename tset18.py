@@ -97,7 +97,7 @@ def main():
     count3 = [0, 0]
 
     while True:
-        time.sleep(0.5)
+        time.sleep(1)
         try:
             tasks = [gevent.spawn(fetch_order_book, okex, 'ZEC/BTC'),
                  gevent.spawn(fetch_order_book, okex, 'ETC/USDT'),
