@@ -56,18 +56,18 @@ def main():
     okex = ccxt.okex()
     bittrex = ccxt.bittrex()
 
-    temp = re.compile('{(.*)}')
+    # temp = re.compile('{(.*)}')
 
-    with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
-        info = sam_pair.readline()
+    # with open("okex_bittrex_same_tarde_pair.log", 'r', encoding='utf-8') as sam_pair:
+        # info = sam_pair.readline()
 
-    math_str = temp.search(info)
+    # math_str = temp.search(info)
 
-    same_pair_str = math_str.group(1)
+    # same_pair_str = math_str.group(1)
 
-    same_pair_str = same_pair_str.replace("'", '')
-    same_pair_str = same_pair_str.replace(" ", '')
-    same_pair_list = same_pair_str.split(',')
+    # same_pair_str = same_pair_str.replace("'", '')
+    # same_pair_str = same_pair_str.replace(" ", '')
+    # same_pair_list = same_pair_str.split(',')
 
     # 创造记录上一次价格的变量，以便盘口信息没有变动，但是一直判断有交易信号
     a_ask1_price = 0
@@ -99,16 +99,16 @@ def main():
     while True:
         time.sleep(0.5)
         try:
-            tasks = [gevent.spawn(fetch_order_book, okex, 'ADA/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'XRP/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'TRX/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'NEO/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'LTC/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'ADA/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'XRP/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'TRX/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'NEO/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'LTC/BTC')]
+            tasks = [gevent.spawn(fetch_order_book, okex, 'ZEC/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'ETC/USDT'),
+                 gevent.spawn(fetch_order_book, okex, 'LTC/USDT'),
+                 gevent.spawn(fetch_order_book, okex, 'ZRX/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'DASH/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'ZEC/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'ETC/USDT'),
+                 gevent.spawn(fetch_order_book, bittrex, 'LTC/USDT'),
+                 gevent.spawn(fetch_order_book, bittrex, 'ZRX/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'DASH/BTC')]
             gevent.joinall(tasks)
             task1, task2, task3, task4, task5, task6, task7, task8, task9, task10 = tasks
         except Exception as e:
