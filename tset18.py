@@ -99,16 +99,16 @@ def main():
     while True:
         time.sleep(1)
         try:
-            tasks = [gevent.spawn(fetch_order_book, okex, 'XEM/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'ZEN/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'XMR/BTC'),
-                 gevent.spawn(fetch_order_book, okex, 'ADA/ETH'),
-                 gevent.spawn(fetch_order_book, okex, 'SC/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'XEM/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'ZEN/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'XMR/BTC'),
-                 gevent.spawn(fetch_order_book, bittrex, 'ADA/ETH'),
-                 gevent.spawn(fetch_order_book, bittrex, 'SC/BTC')]
+            tasks = [gevent.spawn(fetch_order_book, okex, 'QTUM/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'DCR/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'LSK/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'RCN/BTC'),
+                 gevent.spawn(fetch_order_book, okex, 'GNT/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'QTUM/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'DCR/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'LSK/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'RCN/BTC'),
+                 gevent.spawn(fetch_order_book, bittrex, 'GNT/BTC')]
             gevent.joinall(tasks)
             task1, task2, task3, task4, task5, task6, task7, task8, task9, task10 = tasks
         except Exception as e:
