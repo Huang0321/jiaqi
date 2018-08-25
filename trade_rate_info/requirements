@@ -1,0 +1,9 @@
+pymysql
+gevent
+numpy
+pandas
+ccxt
+binance
+pymongo
+redis
+
